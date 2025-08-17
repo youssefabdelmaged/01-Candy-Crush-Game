@@ -9,6 +9,60 @@ function candyCrushGame() {
     const squares = [];
     let score = 0;
 
+    // Chart.js setup for score over time
+    let scoreChart = null;
+    let chartLabels = [];
+    let chartData = [];
+    const scoreChartCanvas = document.getElementById("scoreChart");
+    if (window.Chart && scoreChartCanvas) {
+        const ctx = scoreChartCanvas.getContext("2d");
+        scoreChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: "Score",
+                    data: chartData,
+                    borderColor: "rgba(75, 192, 192, 1)",
+                    backgroundColor: "rgba(75, 192, 192, 0.2)",
+                    tension: 0.2,
+                    pointRadius: 1
+                }]
+            },
+            options: {
+                responsive: false,
+                animation: false,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: "Event" }
+                    },
+                    y: {
+                        title: { display: true, text: "Score" },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        chartLabels.push("0");
+        chartData.push(0);
+        scoreChart.update("none");
+    }
+
+    function applyScore(points, matchLabel) {
+        score += points;
+        scoreDisplay.innerHTML = score;
+        if (scoreChart) {
+            const nextIndex = chartLabels.length + 1;
+            chartLabels.push(nextIndex.toString());
+            chartData.push(score);
+            scoreChart.update("none");
+        }
+    }
+
     const candyColors = [
         "url(https://raw.githubusercontent.com/arpit456jain/Amazing-Js-Projects/master/Candy%20Crush/utils/red-candy.png)",
         "url(https://raw.githubusercontent.com/arpit456jain/Amazing-Js-Projects/master/Candy%20Crush/utils/blue-candy.png)",
@@ -163,8 +217,7 @@ function candyCrushGame() {
                         !isBlank
                 )
             ) {
-                score += 4;
-                scoreDisplay.innerHTML = score;
+                applyScore(4, "Row of Four");
                 rowOfFour.forEach((index) => {
                     squares[index].style.backgroundImage = "";
                 });
@@ -187,8 +240,7 @@ function candyCrushGame() {
                         !isBlank
                 )
             ) {
-                score += 4;
-                scoreDisplay.innerHTML = score;
+                applyScore(4, "Column of Four");
                 columnOfFour.forEach((index) => {
                     squares[index].style.backgroundImage = "";
                 });
@@ -229,8 +281,7 @@ function candyCrushGame() {
                         !isBlank
                 )
             ) {
-                score += 3;
-                scoreDisplay.innerHTML = score;
+                applyScore(3, "Row of Three");
                 rowOfThree.forEach((index) => {
                     squares[index].style.backgroundImage = "";
                 });
@@ -253,8 +304,7 @@ function candyCrushGame() {
                         !isBlank
                 )
             ) {
-                score += 3;
-                scoreDisplay.innerHTML = score;
+                applyScore(3, "Column of Three");
                 columnOfThree.forEach((index) => {
                     squares[index].style.backgroundImage = "";
                 });
